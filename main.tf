@@ -7,7 +7,6 @@ terraform {
   }
 }
 
-
 provider "google" {
   credentials = file("../raghuram-exec.json")
   project = "raghuram-exec"
