@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("../raghuram-exec.json")
+  credentials = file("raghuram-exec.json")
   project = "raghuram-exec"
   region  = "australia-southeast1"
   zone    = "australia-southeast1-a"
@@ -19,6 +19,13 @@ terraform {
     bucket  = "iac-terraform-gcp"
     prefix  = "terraform/state"
   }
+}
+
+module "iam" {
+  source = "./iam"
+  project_id = var.project_id
+  region = var.region
+  zone = var.zone
 }
 
 module "buckets" {

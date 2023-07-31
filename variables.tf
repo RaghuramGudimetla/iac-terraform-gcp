@@ -21,6 +21,8 @@ variable "active_services" {
         "pubsub.googleapis.com",
         "cloudfunctions.googleapis.com",
         "cloudscheduler.googleapis.com",
-        "cloudbuild.googleapis.com"
+        "cloudbuild.googleapis.com",
+        "run.googleapis.com",
+        "artifactregistry.googleapis.com"
     ]
 }
