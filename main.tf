@@ -1,8 +1,8 @@
 terraform {
   required_providers {
-    google = {
+    google-beta = {
       source = "hashicorp/google-beta"
-      version = "4.69.1"
+      version = "4.40.0"
     }
   }
 }
@@ -69,6 +69,13 @@ module "cloud_functions" {
     module.buckets,
     google_project_service.project_active_services
   ]
+}
+
+module "prefect" {
+  source = "./prefect"
+  project_id = var.project_id
+  region = var.region
+  zone = var.zone
 }
 
 resource "google_project_service" "project_active_services" {

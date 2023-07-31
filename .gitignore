@@ -39,3 +39,4 @@ terraform.rc
 
 .data/**
 raghuram-exec.json
+.local_variables.sh
