@@ -78,6 +78,13 @@ module "prefect" {
   zone = var.zone
 }
 
+module "snowflake" {
+  source = "./snowflake"
+  project_id = var.project_id
+  region = var.region
+  zone = var.zone
+}
+
 resource "google_project_service" "project_active_services" {
   for_each = toset(var.active_services)
   project = var.project_id
