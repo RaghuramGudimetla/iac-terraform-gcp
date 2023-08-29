@@ -1,11 +1,6 @@
-locals {
-  storage_int_sa      = "yngjpmjfqr@sfc-au-1-nla.iam.gserviceaccount.com"
-  notification_int_sa = "smgwtyzpfn@sfc-au-1-nla.iam.gserviceaccount.com"
-}
-
 # Bucket
-resource "google_storage_bucket" "snowflake_export" {
-  name     = "${var.project_id}-snowflake-export"
+resource "google_storage_bucket" "bucket" {
+  name     = replace("${var.project_id}-${var.name}", "_", "-")
   project  = var.project_id
   location = var.region
 }
@@ -13,11 +8,11 @@ resource "google_storage_bucket" "snowflake_export" {
 # Pubsub
 resource "google_pubsub_topic" "topic_snowflake_events" {
   project = var.project_id
-  name    = "${var.project_id}-topic-snowflake-events"
+  name    = replace("${var.project_id}-topic-${var.name}", "_", "-")
 }
 
 resource "google_pubsub_subscription" "subscription_snowflake_events" {
-  name    = "${var.project_id}-subscription-snowflake-events"
+  name    = replace("${var.project_id}-subscription-${var.name}", "_", "-")
   project = var.project_id
   topic   = google_pubsub_topic.topic_snowflake_events.name
 
@@ -28,7 +23,7 @@ resource "google_pubsub_subscription" "subscription_snowflake_events" {
 
 # Notifications
 resource "google_storage_notification" "notification" {
-  bucket         = google_storage_bucket.snowflake_export.name
+  bucket         = google_storage_bucket.bucket.name
   payload_format = "JSON_API_V1"
   topic          = google_pubsub_topic.topic_snowflake_events.id
   event_types    = ["OBJECT_FINALIZE", "OBJECT_METADATA_UPDATE"]
@@ -60,21 +55,15 @@ resource "google_project_iam_custom_role" "snowflake_role" {
 }
 
 resource "google_storage_bucket_iam_binding" "binding" {
-  bucket = google_storage_bucket.snowflake_export.name
+  bucket = google_storage_bucket.bucket.name
   role   = google_project_iam_custom_role.snowflake_role.id
   members = [
-    "serviceAccount:${local.storage_int_sa}",
+    "serviceAccount:${var.storage_int_sa}",
   ]
 }
 
 resource "google_pubsub_subscription_iam_member" "editor" {
   subscription = google_pubsub_subscription.subscription_snowflake_events.name
   role         = "roles/pubsub.subscriber"
-  member       = "serviceAccount:${local.notification_int_sa}"
-}
-
-resource "google_project_iam_member" "snowflake_subscription_viewer_permission" {
-  project = var.project_id
-  role    = "roles/monitoring.viewer"
-  member  = "serviceAccount:${local.notification_int_sa}"
+  member       = "serviceAccount:${var.notification_int_sa}"
 }
